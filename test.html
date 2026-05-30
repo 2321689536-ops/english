@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TTS诊断 v4</title>
+<style>
+  body{font-family:sans-serif;padding:16px;background:#f5f5f5;}
+  .group{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
+  h3{font-size:13px;color:#888;margin-bottom:12px;text-transform:uppercase;}
+  .btn{display:block;width:100%;padding:14px 16px;margin-bottom:10px;border:none;border-radius:12px;background:#1a1a2e;color:#fff;font-size:14px;text-align:left;cursor:pointer;}
+  .btn.ok{background:#16a34a;} .btn.fail{background:#dc2626;} .btn.run{background:#d97706;}
+  .log{background:#111;color:#0f0;font-size:11px;font-family:monospace;padding:12px;border-radius:10px;min-height:80px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<h2 style="margin-bottom:4px">TTS诊断 v4</h2>
+<p style="color:#888;font-size:13px;margin-bottom:16px">用<b>华为浏览器</b>打开，依次点击所有按钮</p>
+
+<div class="group">
+  <h3>有道 — type=2（美式）句子</h3>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=I+want+to+go+home&type=2')">① type=2: I want to go home</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=We+have+time&type=2')">② type=2: We have time</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=Take+your+time&type=2')">③ type=2: Take your time</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=I+feel+tired+I+need+sleep&type=2')">④ type=2: I feel tired I need sleep</button>
+</div>
+
+<div class="group">
+  <h3>有道 — type=1（英式）句子</h3>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=I+want+to+go+home&type=1')">⑤ type=1: I want to go home</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=We+have+time&type=1')">⑥ type=1: We have time</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=I+feel+tired+I+need+sleep&type=1')">⑦ type=1: I feel tired I need sleep</button>
+</div>
+
+<div class="group">
+  <h3>有道 — 单词对比（听声音是否统一）</h3>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=I&type=2')">⑧ 单词 "I" type=2</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=want&type=2')">⑨ 单词 "want" type=2</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=go&type=2')">⑩ 单词 "go" type=2</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=home&type=2')">⑪ 单词 "home" type=2</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=time&type=2')">⑫ 单词 "time" type=2</button>
+  <button class="btn" onclick="t(this,'https://dict.youdao.com/dictvoice?audio=tired&type=2')">⑬ 单词 "tired" type=2</button>
+</div>
+
+<div class="group">
+  <h3>诊断日志</h3>
+  <div class="log" id="log">等待...</div>
+</div>
+
+<script>
+const log=document.getElementById('log');
+function L(m){log.textContent+=new Date().toLocaleTimeString()+' '+m+'\n';log.scrollTop=9999;}
+let cur=null;
+function stop(){if(cur){try{cur.pause();cur.src='';}catch(e){}cur=null;}}
+function t(btn,url){
+  stop();
+  const orig=btn.textContent;
+  btn.className='btn run'; btn.textContent='⏳ 加载...';
+  L('→ '+url.substring(url.indexOf('audio=')+6, url.indexOf('audio=')+40));
+  const a=new Audio(); cur=a; let done=false;
+  const fin=(ok,msg)=>{
+    if(done)return; done=true;
+    btn.className='btn '+(ok?'ok':'fail');
+    btn.textContent=(ok?'✅ ':'❌ ')+orig;
+    L((ok?'✅':'❌')+' '+(msg||''));
+  };
+  a.onplaying=()=>{btn.textContent='🔊 '+orig; L('  playing ✓');};
+  a.onended=()=>fin(true);
+  a.onerror=()=>fin(false,'error='+(a.error?a.error.code:'?'));
+  const tm=setTimeout(()=>fin(false,'超时5s'),5000);
+  a.oncanplay=()=>clearTimeout(tm);
+  a.src=url;
+  a.play().catch(e=>fin(false,'rejected:'+e.message));
+}
+window.onload=()=>{
+  L('UA: '+navigator.userAgent.substring(0,60));
+  L('域名: '+location.hostname);
+};
+</script>
+</body>
+</html>
