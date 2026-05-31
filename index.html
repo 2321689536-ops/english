@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>每日英语</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #faf8f3;
+      --accent: #e8603c;
+      --muted: #8a8a9a;
+      --card-bg: #ffffff;
+      --tag-bg: #f0ede6;
+      --shadow: 0 4px 24px rgba(26,26,46,0.10);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Noto Sans SC', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+    .header {
+      padding: 36px 22px 20px;
+      max-width: 520px;
+      margin: auto;
+    }
+    .date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+    .date-badge .dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    h1 span { color: var(--accent); }
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .progress-wrap {
+      max-width: 520px;
+      margin: 0 auto 28px;
+      padding: 0 22px;
+    }
+    .progress-bar {
+      height: 3px;
+      background: #e2ded6;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 0.04em;
+    }
+    .cards-container {
+      max-width: 520px;
+      margin: auto;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 28px 26px 22px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(22px);
+      animation: fadeUp 0.45s ease forwards;
+    }
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.12s; }
+    .card:nth-child(3) { animation-delay: 0.19s; }
+    .card:nth-child(4) { animation-delay: 0.26s; }
+    .card:nth-child(5) { animation-delay: 0.33s; }
+    .card:nth-child(6) { animation-delay: 0.38s; }
+    .card:nth-child(7) { animation-delay: 0.43s; }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .word {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .card-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      background: var(--tag-bg);
+      padding: 4px 10px;
+      border-radius: 100px;
+      margin-top: 6px;
+    }
+    .meaning-tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 18px;
+    }
+    .phonetic {
+      font-size: 14px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+    .divider {
+      height: 1px;
+      background: #f0ede6;
+      margin-bottom: 18px;
+    }
+    .sentence-en {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+    .highlight { color: var(--accent); font-style: italic; }
+    .sentence-zh {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .btn-group { display: flex; gap: 10px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 500;
+      padding: 12px 18px;
+      border-radius: 14px;
+      min-height: 46px;
+      transition: all 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-word { background: var(--ink); color: #fff; flex: 1; }
+    .btn-sent { background: var(--tag-bg); color: var(--ink); flex: 1.2; }
+    .btn:active { transform: scale(0.96); }
+    .btn.playing { background: var(--accent); color: #fff; }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+    .review-label {
+      max-width: 520px;
+      margin: 4px auto 12px;
+      padding: 0 22px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .footer {
+      max-width: calc(100% - 32px);
+      margin: 24px 16px 0;
+      padding: 24px 22px;
+      background: var(--ink);
+      color: rgba(255,255,255,0.85);
+      border-radius: 28px;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+    .footer strong { color: #fff; font-size: 15px; }
+    .footer .tip {
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.8;
+    }
+    .streak-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 520px;
+      margin: 0 auto 20px;
+      padding: 0 22px;
+    }
+    .streak-box {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 14px 18px;
+      flex: 1;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .streak-icon { font-size: 22px; }
+    .streak-info .val { font-size: 20px; font-weight: 700; line-height: 1; }
+    .streak-info .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    @media (max-width: 400px) {
+      h1 { font-size: 34px; }
+      .word { font-size: 36px; }
+      .sentence-en { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="date-badge">
+    <span class="dot"></span>
+    <span id="dateStr">今日单词</span>
+  </div>
+  <h1>每日<span>英语</span><br>微习惯</h1>
+  <p class="subtitle">每天 5 个词 · 听读结合 · 持续接触<br>重点不是努力，而是每天都见到它</p>
+</div>
+
+<div class="streak-row">
+  <div class="streak-box">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-info">
+      <div class="val" id="streakDays">—</div>
+      <div class="lbl">连续天数</div>
+    </div>
+  </div>
+  <div class="streak-box">
+    <div class="streak-icon">📚</div>
+    <div class="streak-info">
+      <div class="val" id="totalWords">—</div>
+      <div class="lbl">累计单词</div>
+    </div>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">第 1 组 / 共 ? 组</div>
+</div>
+
+<div class="cards-container" id="todayCards"></div>
+<div class="review-label">👀 复习回顾</div>
+<div class="cards-container" id="reviewCards"></div>
+
+<div class="footer">
+  <strong>坚持下去的秘诀</strong><br>
+  不是每次都记住，<br>
+  而是每天都打开一次。<br>
+  几个月后，你会发现英语开始变得熟悉。
+  <div class="tip">
+    建议使用 Chrome 或 Edge 浏览器以获得最佳发音效果。<br>
+    手机、平板、电脑均可使用。
+  </div>
+</div>
+
+<script>
+// ─── 300-WORD DATABASE ───────────────────────────────────────────
+// 说明：从第 6 组（第31个词）起，例句中有意复用前面学过的词（加粗标注为 highlight）
+// 每条数据格式：{ word, phonetic, meaning, sentence, highlight, zh }
+const WORDS = [
+
+// ── 第1组（Day 1）基础动词 ──
+{ word:'get',    phonetic:'/ɡet/',     meaning:'得到 · 明白',   sentence:'I get it.',                    highlight:'get',    zh:'我明白了。' },
+{ word:'go',     phonetic:'/ɡoʊ/',     meaning:'去',            sentence:'I want to go home.',           highlight:'go',     zh:'我想回家。' },
+{ word:'make',   phonetic:'/meɪk/',    meaning:'制作 · 让',     sentence:'You make me happy.',           highlight:'make',   zh:'你让我开心。' },
+{ word:'take',   phonetic:'/teɪk/',    meaning:'拿 · 带',       sentence:'Take your time.',              highlight:'Take',   zh:'别着急。' },
+{ word:'want',   phonetic:'/wɑːnt/',   meaning:'想要',          sentence:'I want some water.',           highlight:'want',   zh:'我想喝点水。' },
+
+// ── 第2组（Day 2）基础动词 ──
+{ word:'know',   phonetic:'/noʊ/',     meaning:'知道',          sentence:'I know your name.',            highlight:'know',   zh:'我知道你的名字。' },
+{ word:'come',   phonetic:'/kʌm/',     meaning:'来',            sentence:'Come with me.',                highlight:'Come',   zh:'跟我来。' },
+{ word:'help',   phonetic:'/help/',    meaning:'帮助',          sentence:'Can you help me?',             highlight:'help',   zh:'你能帮我吗？' },
+{ word:'work',   phonetic:'/wɜːrk/',   meaning:'工作',          sentence:'I have to work today.',        highlight:'work',   zh:'我今天得工作。' },
+{ word:'good',   phonetic:'/ɡʊd/',     meaning:'好的',          sentence:'This looks good.',             highlight:'good',   zh:'这个看起来不错。' },
+
+// ── 第3组（Day 3）基础动词 ──
+{ word:'need',   phonetic:'/niːd/',    meaning:'需要',          sentence:'I need some rest.',            highlight:'need',   zh:'我需要休息。' },
+{ word:'try',    phonetic:'/traɪ/',    meaning:'尝试',          sentence:'I will try again.',            highlight:'try',    zh:'我会再试一次。' },
+{ word:'think',  phonetic:'/θɪŋk/',    meaning:'思考 · 认为',   sentence:'I think so.',                  highlight:'think',  zh:'我也这么觉得。' },
+{ word:'time',   phonetic:'/taɪm/',    meaning:'时间',          sentence:'We have time.',                highlight:'time',   zh:'我们有时间。' },
+{ word:'water',  phonetic:'/ˈwɔːtər/', meaning:'水',            sentence:'Drink more water.',            highlight:'water',  zh:'多喝水。' },
+
+// ── 第4组（Day 4）日常动词 ──
+{ word:'eat',    phonetic:'/iːt/',     meaning:'吃',            sentence:'Let us eat together.',         highlight:'eat',    zh:'我们一起吃吧。' },
+{ word:'see',    phonetic:'/siː/',     meaning:'看见 · 明白',   sentence:'I see what you mean.',         highlight:'see',    zh:'我明白你的意思。' },
+{ word:'say',    phonetic:'/seɪ/',     meaning:'说',            sentence:'What did you say?',            highlight:'say',    zh:'你说了什么？' },
+{ word:'love',   phonetic:'/lʌv/',     meaning:'爱 · 喜欢',     sentence:'I love this place.',           highlight:'love',   zh:'我喜欢这个地方。' },
+{ word:'feel',   phonetic:'/fiːl/',    meaning:'感觉',          sentence:'I feel tired today.',          highlight:'feel',   zh:'我今天感觉很累。' },
+
+// ── 第5组（Day 5）日常词 ──
+{ word:'here',   phonetic:'/hɪr/',     meaning:'这里',          sentence:'I am here.',                   highlight:'here',   zh:'我在这里。' },
+{ word:'sleep',  phonetic:'/sliːp/',   meaning:'睡觉',          sentence:'I need to sleep now.',         highlight:'sleep',  zh:'我现在需要睡觉。' },
+{ word:'buy',    phonetic:'/baɪ/',     meaning:'买',            sentence:'I want to buy this.',          highlight:'buy',    zh:'我想买这个。' },
+{ word:'give',   phonetic:'/ɡɪv/',     meaning:'给',            sentence:'Give me a moment.',            highlight:'Give',   zh:'给我一点时间。' },
+{ word:'open',   phonetic:'/ˈoʊpən/', meaning:'打开',           sentence:'Open the window please.',      highlight:'Open',   zh:'请打开窗户。' },
+
+// ── 第6组（Day 6）沟通词 ── 例句开始复用前面词
+{ word:'read',   phonetic:'/riːd/',    meaning:'读',            sentence:'I like to read every day.',    highlight:'read',   zh:'我喜欢每天阅读。' },
+{ word:'listen', phonetic:'/ˈlɪsən/', meaning:'听',             sentence:'Listen I need your help.',    highlight:'listen', zh:'听着，我需要你的帮助。' },
+{ word:'ask',    phonetic:'/æsk/',     meaning:'问 · 请求',     sentence:'Can I ask you something?',     highlight:'ask',    zh:'我可以问你一件事吗？' },
+{ word:'talk',   phonetic:'/tɔːk/',    meaning:'说话 · 聊天',   sentence:'We need to talk.',             highlight:'talk',   zh:'我们需要谈谈。' },
+{ word:'wait',   phonetic:'/weɪt/',    meaning:'等待',          sentence:'Please wait I am coming.',    highlight:'wait',   zh:'请等一下，我来了。' },
+
+// ── 第7组（Day 7）人与关系 ──
+{ word:'friend', phonetic:'/frend/',   meaning:'朋友',          sentence:'She is a good friend.',        highlight:'friend', zh:'她是个好朋友。' },
+{ word:'family', phonetic:'/ˈfæmɪli/',meaning:'家人 · 家庭',   sentence:'I love my family.',            highlight:'family', zh:'我爱我的家人。' },
+{ word:'child',  phonetic:'/tʃaɪld/',  meaning:'孩子',          sentence:'The child wants to eat.',      highlight:'child',  zh:'孩子想吃东西。' },
+{ word:'people', phonetic:'/ˈpiːpəl/', meaning:'人 · 人们',     sentence:'Many people work here.',       highlight:'people', zh:'很多人在这里工作。' },
+{ word:'man',    phonetic:'/mæn/',     meaning:'男人 · 人',     sentence:'That man helped me.',          highlight:'man',    zh:'那个男人帮了我。' },
+
+// ── 第8组（Day 8）地点 ──
+{ word:'home',   phonetic:'/hoʊm/',    meaning:'家',            sentence:'I want to go home now.',       highlight:'home',   zh:'我现在想回家。' },
+{ word:'school', phonetic:'/skuːl/',   meaning:'学校',          sentence:'The child goes to school.',    highlight:'school', zh:'孩子去上学了。' },
+{ word:'store',  phonetic:'/stɔːr/',   meaning:'商店',          sentence:'I need to go to the store.',   highlight:'store',  zh:'我需要去商店。' },
+{ word:'room',   phonetic:'/ruːm/',    meaning:'房间',          sentence:'Come to my room.',             highlight:'room',   zh:'来我房间。' },
+{ word:'city',   phonetic:'/ˈsɪti/',   meaning:'城市',          sentence:'This is a big city.',          highlight:'city',   zh:'这是一个大城市。' },
+
+// ── 第9组（Day 9）食物饮品 ──
+{ word:'food',   phonetic:'/fuːd/',    meaning:'食物',          sentence:'I love good food.',            highlight:'food',   zh:'我喜欢美食。' },
+{ word:'coffee', phonetic:'/ˈkɔːfi/',  meaning:'咖啡',          sentence:'I drink coffee every day.',    highlight:'coffee', zh:'我每天喝咖啡。' },
+{ word:'bread',  phonetic:'/bred/',    meaning:'面包',          sentence:'I eat bread in the morning.',  highlight:'bread',  zh:'我早上吃面包。' },
+{ word:'rice',   phonetic:'/raɪs/',    meaning:'米饭',          sentence:'We eat rice every day.',       highlight:'rice',   zh:'我们每天吃米饭。' },
+{ word:'fruit',  phonetic:'/fruːt/',   meaning:'水果',          sentence:'Eat more fruit it is good.',  highlight:'fruit',  zh:'多吃水果，对你好。' },
+
+// ── 第10组（Day 10）时间词 ──
+{ word:'today',  phonetic:'/təˈdeɪ/',  meaning:'今天',          sentence:'I feel good today.',           highlight:'today',  zh:'我今天感觉不错。' },
+{ word:'now',    phonetic:'/naʊ/',     meaning:'现在',          sentence:'Come here now.',               highlight:'now',    zh:'现在来这里。' },
+{ word:'day',    phonetic:'/deɪ/',     meaning:'天 · 白天',     sentence:'Have a good day!',             highlight:'day',    zh:'祝你今天愉快！' },
+{ word:'week',   phonetic:'/wiːk/',    meaning:'周 · 星期',     sentence:'I work five days a week.',     highlight:'week',   zh:'我一周工作五天。' },
+{ word:'year',   phonetic:'/jɪr/',     meaning:'年',            sentence:'This year is going well.',     highlight:'year',   zh:'今年进展顺利。' },
+
+// ── 第11组（Day 11）描述词 ──
+{ word:'big',    phonetic:'/bɪɡ/',     meaning:'大',            sentence:'I want a big room.',           highlight:'big',    zh:'我想要一个大房间。' },
+{ word:'small',  phonetic:'/smɔːl/',   meaning:'小',            sentence:'This store is too small.',     highlight:'small',  zh:'这家店太小了。' },
+{ word:'new',    phonetic:'/njuː/',    meaning:'新的',           sentence:'I need a new phone.',          highlight:'new',    zh:'我需要一部新手机。' },
+{ word:'old',    phonetic:'/oʊld/',    meaning:'旧的 · 老的',   sentence:'This is a very old city.',     highlight:'old',    zh:'这是一座非常古老的城市。' },
+{ word:'happy',  phonetic:'/ˈhæpi/',   meaning:'快乐的',        sentence:'I feel happy today.',          highlight:'happy',  zh:'我今天感觉很快乐。' },
+
+// ── 第12组（Day 12）描述词 ──
+{ word:'sorry',  phonetic:'/ˈsɒri/',   meaning:'抱歉',          sentence:'I am sorry I was late.',      highlight:'sorry',  zh:'对不起，我迟到了。' },
+{ word:'sure',   phonetic:'/ʃʊr/',     meaning:'确定 · 当然',   sentence:'Sure I can help you.',        highlight:'sure',   zh:'当然，我可以帮你。' },
+{ word:'ready',  phonetic:'/ˈredi/',   meaning:'准备好的',      sentence:'Are you ready to go?',         highlight:'ready',  zh:'你准备好出发了吗？' },
+{ word:'busy',   phonetic:'/ˈbɪzi/',   meaning:'忙碌的',        sentence:'I am very busy this week.',    highlight:'busy',   zh:'这周我很忙。' },
+{ word:'late',   phonetic:'/leɪt/',    meaning:'晚的 · 迟到',   sentence:'Do not be late for work.',     highlight:'late',   zh:'上班不要迟到。' },
+
+// ── 第13组（Day 13）身体健康 ──
+{ word:'tired',  phonetic:'/ˈtaɪərd/', meaning:'疲倦的',        sentence:'I feel tired I need sleep.',  highlight:'tired',  zh:'我感到疲倦，需要睡觉。' },
+{ word:'sick',   phonetic:'/sɪk/',     meaning:'生病的',        sentence:'I feel sick today.',           highlight:'sick',   zh:'我今天感觉不舒服。' },
+{ word:'doctor', phonetic:'/ˈdɒktər/', meaning:'医生',          sentence:'I need to see a doctor.',      highlight:'doctor', zh:'我需要去看医生。' },
+{ word:'hand',   phonetic:'/hænd/',    meaning:'手',            sentence:'Give me your hand.',           highlight:'hand',   zh:'把你的手给我。' },
+{ word:'face',   phonetic:'/feɪs/',    meaning:'脸',            sentence:'Wash your face.',              highlight:'face',   zh:'洗脸。' },
+
+// ── 第14组（Day 14）交通出行 ──
+{ word:'walk',   phonetic:'/wɔːk/',    meaning:'走路',          sentence:'Let us walk to the store.',    highlight:'walk',   zh:'我们走路去商店吧。' },
+{ word:'drive',  phonetic:'/draɪv/',   meaning:'开车',          sentence:'Can you drive me home?',       highlight:'drive',  zh:'你能开车送我回家吗？' },
+{ word:'bus',    phonetic:'/bʌs/',     meaning:'公共汽车',      sentence:'I take the bus to work.',      highlight:'bus',    zh:'我坐公交车上班。' },
+{ word:'road',   phonetic:'/roʊd/',    meaning:'道路',          sentence:'This road is too busy.',       highlight:'road',   zh:'这条路太堵了。' },
+{ word:'car',    phonetic:'/kɑːr/',    meaning:'汽车',          sentence:'I want to buy a new car.',     highlight:'car',    zh:'我想买一辆新车。' },
+
+// ── 第15组（Day 15）数字基础 ──
+{ word:'one',    phonetic:'/wʌn/',     meaning:'一',            sentence:'I need one more day.',         highlight:'one',    zh:'我还需要一天。' },
+{ word:'two',    phonetic:'/tuː/',     meaning:'二',            sentence:'I have two good friends.',     highlight:'two',    zh:'我有两个好朋友。' },
+{ word:'three',  phonetic:'/θriː/',    meaning:'三',            sentence:'Wait three more minutes.',     highlight:'three',  zh:'再等三分钟。' },
+{ word:'first',  phonetic:'/fɜːrst/',  meaning:'第一 · 首先',   sentence:'First eat something.',        highlight:'first',  zh:'首先，吃点东西。' },
+{ word:'last',   phonetic:'/læst/',    meaning:'最后 · 上一个', sentence:'This is my last chance.',      highlight:'last',   zh:'这是我最后的机会。' },
+
+// ── 第16组（Day 16）购物消费 ──
+{ word:'money',  phonetic:'/ˈmʌni/',   meaning:'钱',            sentence:'I do not have enough money.',  highlight:'money',  zh:'我没有足够的钱。' },
+{ word:'pay',    phonetic:'/peɪ/',     meaning:'付款 · 支付',   sentence:'I will pay for this.',         highlight:'pay',    zh:'这个我来付。' },
+{ word:'sell',   phonetic:'/sel/',     meaning:'卖',            sentence:'Do you sell coffee here?',     highlight:'sell',   zh:'这里卖咖啡吗？' },
+{ word:'price',  phonetic:'/praɪs/',   meaning:'价格',          sentence:'What is the price?',           highlight:'price',  zh:'价格是多少？' },
+{ word:'cheap',  phonetic:'/tʃiːp/',   meaning:'便宜的',        sentence:'This food is cheap and good.', highlight:'cheap',  zh:'这食物又便宜又好。' },
+
+// ── 第17组（Day 17）学习工作 ──
+{ word:'learn',  phonetic:'/lɜːrn/',   meaning:'学习',          sentence:'I want to learn English.',     highlight:'learn',  zh:'我想学英语。' },
+{ word:'study',  phonetic:'/ˈstʌdi/',  meaning:'学习 · 研究',   sentence:'I study every day.',           highlight:'study',  zh:'我每天都学习。' },
+{ word:'teach',  phonetic:'/tiːtʃ/',   meaning:'教',            sentence:'Can you teach me this?',       highlight:'teach',  zh:'你能教我这个吗？' },
+{ word:'write',  phonetic:'/raɪt/',    meaning:'写',            sentence:'Write your name here.',        highlight:'write',  zh:'在这里写上你的名字。' },
+{ word:'use',    phonetic:'/juːz/',    meaning:'使用',          sentence:'I use this every day.',        highlight:'use',    zh:'我每天都用这个。' },
+
+// ── 第18组（Day 18）情绪感受 ──
+{ word:'like',   phonetic:'/laɪk/',    meaning:'喜欢',          sentence:'I like to walk in the morning.',highlight:'like',  zh:'我喜欢在早上散步。' },
+{ word:'hate',   phonetic:'/heɪt/',    meaning:'讨厌',          sentence:'I hate being late.',           highlight:'hate',   zh:'我讨厌迟到。' },
+{ word:'worry',  phonetic:'/ˈwɜːri/',  meaning:'担心',          sentence:'Do not worry I am here.',     highlight:'worry',  zh:'别担心，我在这里。' },
+{ word:'enjoy',  phonetic:'/ɪnˈdʒɔɪ/', meaning:'享受',         sentence:'I enjoy eating good food.',    highlight:'enjoy',  zh:'我享受吃美食。' },
+{ word:'hope',   phonetic:'/hoʊp/',    meaning:'希望',          sentence:'I hope you feel better.',      highlight:'hope',   zh:'我希望你感觉好些。' },
+
+// ── 第19组（Day 19）家庭成员 ──
+{ word:'mother', phonetic:'/ˈmʌðər/',  meaning:'妈妈',          sentence:'My mother is a good doctor.',  highlight:'mother', zh:'我妈妈是一位好医生。' },
+{ word:'father', phonetic:'/ˈfɑːðər/', meaning:'爸爸',          sentence:'My father drives to work.',    highlight:'father', zh:'我爸爸开车上班。' },
+{ word:'sister', phonetic:'/ˈsɪstər/', meaning:'姐妹',          sentence:'My sister loves fruit.',       highlight:'sister', zh:'我姐姐喜欢水果。' },
+{ word:'brother',phonetic:'/ˈbrʌðər/', meaning:'兄弟',          sentence:'My brother and I study together.',highlight:'brother',zh:'我和我兄弟一起学习。' },
+{ word:'wife',   phonetic:'/waɪf/',    meaning:'妻子',          sentence:'My wife works in the city.',   highlight:'wife',   zh:'我妻子在城里工作。' },
+
+// ── 第20组（Day 20）天气自然 ──
+{ word:'weather',phonetic:'/ˈweðər/',  meaning:'天气',          sentence:'The weather is good today.',   highlight:'weather',zh:'今天天气不错。' },
+{ word:'rain',   phonetic:'/reɪn/',    meaning:'雨 · 下雨',     sentence:'I do not like rain.',          highlight:'rain',   zh:'我不喜欢下雨。' },
+{ word:'sun',    phonetic:'/sʌn/',     meaning:'太阳',          sentence:'The sun makes me happy.',      highlight:'sun',    zh:'阳光让我快乐。' },
+{ word:'hot',    phonetic:'/hɒt/',     meaning:'热的',          sentence:'It is too hot today.',         highlight:'hot',    zh:'今天太热了。' },
+{ word:'cold',   phonetic:'/koʊld/',   meaning:'冷的',          sentence:'I feel cold I need a jacket.',highlight:'cold',   zh:'我感到冷，需要穿外套。' },
+
+// ── 第21组（Day 21）颜色 ──
+{ word:'red',    phonetic:'/red/',     meaning:'红色',          sentence:'I love red fruit.',            highlight:'red',    zh:'我喜欢红色的水果。' },
+{ word:'blue',   phonetic:'/bluː/',    meaning:'蓝色',          sentence:'The sky is blue today.',       highlight:'blue',   zh:'今天天空是蓝色的。' },
+{ word:'white',  phonetic:'/waɪt/',    meaning:'白色',          sentence:'Give me the white one.',       highlight:'white',  zh:'给我那个白色的。' },
+{ word:'black',  phonetic:'/blæk/',    meaning:'黑色',          sentence:'I want a black car.',          highlight:'black',  zh:'我想要一辆黑色的车。' },
+{ word:'green',  phonetic:'/ɡriːn/',   meaning:'绿色',          sentence:'Eat more green vegetables.',   highlight:'green',  zh:'多吃绿色蔬菜。' },
+
+// ── 第22组（Day 22）方位 ──
+{ word:'left',   phonetic:'/left/',    meaning:'左',            sentence:'Turn left at the road.',       highlight:'left',   zh:'在路口向左转。' },
+{ word:'right',  phonetic:'/raɪt/',    meaning:'右 · 对的',     sentence:'Turn right and go home.',      highlight:'right',  zh:'右转然后回家。' },
+{ word:'up',     phonetic:'/ʌp/',      meaning:'上',            sentence:'Look up at the sky.',          highlight:'up',     zh:'抬头看天空。' },
+{ word:'down',   phonetic:'/daʊn/',    meaning:'下',            sentence:'Sit down please.',            highlight:'down',   zh:'请坐下。' },
+{ word:'near',   phonetic:'/nɪr/',     meaning:'近 · 附近',     sentence:'Is there a store near here?',  highlight:'near',   zh:'这附近有商店吗？' },
+
+// ── 第23组（Day 23）常用短语词 ──
+{ word:'also',   phonetic:'/ˈɔːlsoʊ/', meaning:'也 · 还',      sentence:'I also need water.',           highlight:'also',   zh:'我也需要水。' },
+{ word:'just',   phonetic:'/dʒʌst/',   meaning:'只是 · 刚刚',   sentence:'I just want to sleep.',        highlight:'just',   zh:'我只是想睡觉。' },
+{ word:'still',  phonetic:'/stɪl/',    meaning:'还 · 仍然',     sentence:'I am still learning.',         highlight:'still',  zh:'我还在学习。' },
+{ word:'again',  phonetic:'/əˈɡen/',   meaning:'再 · 又',       sentence:'Say that again please.',      highlight:'again',  zh:'请再说一遍。' },
+{ word:'very',   phonetic:'/ˈveri/',   meaning:'非常',          sentence:'This food is very good.',      highlight:'very',   zh:'这食物非常好。' },
+
+// ── 第24组（Day 24）问问题 ──
+{ word:'what',   phonetic:'/wɒt/',     meaning:'什么',          sentence:'What do you want to eat?',     highlight:'what',   zh:'你想吃什么？' },
+{ word:'where',  phonetic:'/wer/',     meaning:'哪里',          sentence:'Where do you work?',           highlight:'where',  zh:'你在哪里工作？' },
+{ word:'when',   phonetic:'/wen/',     meaning:'什么时候',      sentence:'When do you go home?',         highlight:'when',   zh:'你什么时候回家？' },
+{ word:'why',    phonetic:'/waɪ/',     meaning:'为什么',        sentence:'Why are you so busy?',         highlight:'why',    zh:'你为什么这么忙？' },
+{ word:'how',    phonetic:'/haʊ/',     meaning:'怎么 · 多么',   sentence:'How do you feel today?',       highlight:'how',    zh:'你今天感觉怎么样？' },
+
+// ── 第25组（Day 25）常用名词 ──
+{ word:'thing',  phonetic:'/θɪŋ/',     meaning:'东西 · 事情',   sentence:'I need to get a few things.',  highlight:'thing',  zh:'我需要买几样东西。' },
+{ word:'place',  phonetic:'/pleɪs/',   meaning:'地方',          sentence:'I know a good place to eat.',  highlight:'place',  zh:'我知道一个好地方可以吃饭。' },
+{ word:'way',    phonetic:'/weɪ/',     meaning:'方式 · 路',     sentence:'What is the best way to go?',  highlight:'way',    zh:'去那里最好的方式是什么？' },
+{ word:'life',   phonetic:'/laɪf/',    meaning:'生活 · 生命',   sentence:'I love my life.',              highlight:'life',   zh:'我热爱我的生活。' },
+{ word:'world',  phonetic:'/wɜːrld/',  meaning:'世界',          sentence:'The world is a big place.',    highlight:'world',  zh:'世界是个很大的地方。' },
+
+// ── 第26组（Day 26）动作词 ──
+{ word:'run',    phonetic:'/rʌn/',     meaning:'跑',            sentence:'I run every morning.',         highlight:'run',    zh:'我每天早上跑步。' },
+{ word:'sit',    phonetic:'/sɪt/',     meaning:'坐',            sentence:'Sit here with me.',            highlight:'sit',    zh:'坐在我旁边。' },
+{ word:'stand',  phonetic:'/stænd/',   meaning:'站',            sentence:'Stand up please.',            highlight:'stand',  zh:'请站起来。' },
+{ word:'stop',   phonetic:'/stɒp/',    meaning:'停止',          sentence:'Stop the car here.',           highlight:'stop',   zh:'在这里停车。' },
+{ word:'start',  phonetic:'/stɑːrt/',  meaning:'开始',          sentence:'Let us start working.',        highlight:'start',  zh:'我们开始工作吧。' },
+
+// ── 第27组（Day 27）数量词 ──
+{ word:'much',   phonetic:'/mʌtʃ/',    meaning:'很多（不可数）', sentence:'I do not eat much rice.',     highlight:'much',   zh:'我不吃很多米饭。' },
+{ word:'many',   phonetic:'/ˈmeni/',   meaning:'很多（可数）',   sentence:'I have many things to do.',   highlight:'many',   zh:'我有很多事情要做。' },
+{ word:'more',   phonetic:'/mɔːr/',    meaning:'更多',          sentence:'I need more time.',            highlight:'more',   zh:'我需要更多时间。' },
+{ word:'less',   phonetic:'/les/',     meaning:'更少',          sentence:'Eat less drink more water.',  highlight:'less',   zh:'少吃点，多喝水。' },
+{ word:'enough', phonetic:'/ɪˈnʌf/',   meaning:'足够',          sentence:'I have enough money today.',   highlight:'enough', zh:'我今天有足够的钱。' },
+
+// ── 第28组（Day 28）重要动词 ──
+{ word:'find',   phonetic:'/faɪnd/',   meaning:'找到',          sentence:'I cannot find my phone.',      highlight:'find',   zh:'我找不到我的手机。' },
+{ word:'put',    phonetic:'/pʊt/',     meaning:'放',            sentence:'Put your things here.',        highlight:'put',    zh:'把你的东西放在这里。' },
+{ word:'keep',   phonetic:'/kiːp/',    meaning:'保持 · 保留',   sentence:'Keep going do not stop.',     highlight:'keep',   zh:'继续，不要停下来。' },
+{ word:'show',   phonetic:'/ʃoʊ/',     meaning:'展示 · 给看',   sentence:'Show me how to do this.',      highlight:'show',   zh:'告诉我怎么做这个。' },
+{ word:'move',   phonetic:'/muːv/',    meaning:'移动 · 搬家',   sentence:'Can you move the car?',        highlight:'move',   zh:'你能把车移开吗？' },
+
+// ── 第29组（Day 29）重要形容词 ──
+{ word:'fast',   phonetic:'/fæst/',    meaning:'快的',          sentence:'He runs very fast.',           highlight:'fast',   zh:'他跑得很快。' },
+{ word:'slow',   phonetic:'/sloʊ/',    meaning:'慢的',          sentence:'Walk slow take your time.',   highlight:'slow',   zh:'慢慢走，别着急。' },
+{ word:'easy',   phonetic:'/ˈiːzi/',   meaning:'容易的',        sentence:'This is easy try it.',        highlight:'easy',   zh:'这很容易，试试看。' },
+{ word:'hard',   phonetic:'/hɑːrd/',   meaning:'困难的 · 努力地',sentence:'Learning is hard but good.', highlight:'hard',   zh:'学习虽难，但值得。' },
+{ word:'safe',   phonetic:'/seɪf/',    meaning:'安全的',        sentence:'Is this road safe to walk?',   highlight:'safe',   zh:'这条路走起来安全吗？' },
+
+// ── 第30组（Day 30）重要形容词 ──
+{ word:'clean',  phonetic:'/kliːn/',   meaning:'干净的',        sentence:'Keep your room clean.',        highlight:'clean',  zh:'保持房间整洁。' },
+{ word:'free',   phonetic:'/friː/',    meaning:'免费的 · 自由的',sentence:'Is this coffee free?',        highlight:'free',   zh:'这咖啡是免费的吗？' },
+{ word:'open',   phonetic:'/ˈoʊpən/', meaning:'开着的 · 营业中',sentence:'Is the store open now?',      highlight:'open',   zh:'商店现在开着吗？' },
+{ word:'close',  phonetic:'/kloʊz/',   meaning:'关闭',          sentence:'Please close the door.',       highlight:'close',  zh:'请关门。' },
+{ word:'long',   phonetic:'/lɔːŋ/',    meaning:'长的 · 久的',   sentence:'It is a long way home.',       highlight:'long',   zh:'回家的路很长。' },
+
+// ── 第31组（Day 31）生活场所 ──
+{ word:'office', phonetic:'/ˈɒfɪs/',   meaning:'办公室',        sentence:'I work in a big office.',      highlight:'office', zh:'我在一个大办公室工作。' },
+{ word:'market', phonetic:'/ˈmɑːrkɪt/',meaning:'市场 · 超市',  sentence:'I buy food at the market.',    highlight:'market', zh:'我在市场买食物。' },
+{ word:'park',   phonetic:'/pɑːrk/',   meaning:'公园',          sentence:'I like to walk in the park.',  highlight:'park',   zh:'我喜欢在公园散步。' },
+{ word:'bank',   phonetic:'/bæŋk/',    meaning:'银行',          sentence:'I need to go to the bank.',    highlight:'bank',   zh:'我需要去银行。' },
+{ word:'church', phonetic:'/tʃɜːrtʃ/', meaning:'教堂',          sentence:'The church is near my home.',  highlight:'church', zh:'教堂在我家附近。' },
+
+// ── 第32组（Day 32）日常物品 ──
+{ word:'phone',  phonetic:'/foʊn/',    meaning:'手机 · 电话',   sentence:'I cannot find my phone.',      highlight:'phone',  zh:'我找不到我的手机。' },
+{ word:'book',   phonetic:'/bʊk/',     meaning:'书',            sentence:'I read this book every day.',  highlight:'book',   zh:'我每天都读这本书。' },
+{ word:'bag',    phonetic:'/bæɡ/',     meaning:'包',            sentence:'Put your things in the bag.',  highlight:'bag',    zh:'把你的东西放进包里。' },
+{ word:'key',    phonetic:'/kiː/',     meaning:'钥匙',          sentence:'I cannot find my key.',        highlight:'key',    zh:'我找不到我的钥匙。' },
+{ word:'table',  phonetic:'/ˈteɪbəl/', meaning:'桌子',          sentence:'Put the food on the table.',   highlight:'table',  zh:'把食物放在桌子上。' },
+
+// ── 第33组（Day 33）动词扩展 ──
+{ word:'call',   phonetic:'/kɔːl/',    meaning:'打电话 · 叫',   sentence:'I will call you later.',       highlight:'call',   zh:'我稍后给你打电话。' },
+{ word:'send',   phonetic:'/send/',    meaning:'发送',          sentence:'Send me your phone number.',   highlight:'send',   zh:'把你的电话号码发给我。' },
+{ word:'meet',   phonetic:'/miːt/',    meaning:'见面',          sentence:'Let us meet near the park.',   highlight:'meet',   zh:'我们在公园附近见面吧。' },
+{ word:'visit',  phonetic:'/ˈvɪzɪt/',  meaning:'拜访 · 参观',   sentence:'I want to visit my family.',   highlight:'visit',  zh:'我想去探望我的家人。' },
+{ word:'return', phonetic:'/rɪˈtɜːrn/',meaning:'返回 · 归还',   sentence:'I will return this book.',     highlight:'return', zh:'我会归还这本书。' },
+
+// ── 第34组（Day 34）身体部位 ──
+{ word:'eye',    phonetic:'/aɪ/',      meaning:'眼睛',          sentence:'Close your eyes and sleep.',   highlight:'eye',    zh:'闭上眼睛睡觉。' },
+{ word:'mouth',  phonetic:'/maʊθ/',    meaning:'嘴',            sentence:'Open your mouth.',             highlight:'mouth',  zh:'把嘴张开。' },
+{ word:'back',   phonetic:'/bæk/',     meaning:'背部 · 后面',   sentence:'My back hurts today.',         highlight:'back',   zh:'我今天背部疼。' },
+{ word:'head',   phonetic:'/hed/',     meaning:'头',            sentence:'My head hurts I need rest.',  highlight:'head',   zh:'我头痛，需要休息。' },
+{ word:'heart',  phonetic:'/hɑːrt/',   meaning:'心脏 · 心',     sentence:'My heart feels happy.',        highlight:'heart',  zh:'我内心感到快乐。' },
+
+// ── 第35组（Day 35）时间副词 ──
+{ word:'always', phonetic:'/ˈɔːlweɪz/',meaning:'总是',          sentence:'I always drink coffee.',       highlight:'always', zh:'我总是喝咖啡。' },
+{ word:'never',  phonetic:'/ˈnevər/',  meaning:'从不',          sentence:'I never eat late at night.',   highlight:'never',  zh:'我从不在深夜吃东西。' },
+{ word:'often',  phonetic:'/ˈɔːfən/',  meaning:'经常',          sentence:'I often walk to work.',        highlight:'often',  zh:'我经常走路上班。' },
+{ word:'soon',   phonetic:'/suːn/',    meaning:'很快',          sentence:'I will come back soon.',       highlight:'soon',   zh:'我很快就回来。' },
+{ word:'early',  phonetic:'/ˈɜːrli/',  meaning:'早',            sentence:'Wake up early and go for a run.',highlight:'early',zh:'早起去跑步。' },
+
+// ── 第36组（Day 36）重要连词与句式 ──
+{ word:'but',    phonetic:'/bʌt/',     meaning:'但是',          sentence:'I want to go but I am busy.', highlight:'but',    zh:'我想去，但我很忙。' },
+{ word:'if',     phonetic:'/ɪf/',      meaning:'如果',          sentence:'If you need help call me.',   highlight:'if',     zh:'如果你需要帮助，就给我打电话。' },
+{ word:'because',phonetic:'/bɪˈkɒz/',  meaning:'因为',          sentence:'I am tired because I worked hard.',highlight:'because',zh:'我很累，因为我努力工作了。' },
+{ word:'before', phonetic:'/bɪˈfɔːr/', meaning:'之前',          sentence:'Eat before you go.',           highlight:'before', zh:'去之前先吃点东西。' },
+{ word:'after',  phonetic:'/ˈæftər/',  meaning:'之后',          sentence:'Call me after work.',          highlight:'after',  zh:'下班后给我打电话。' },
+
+// ── 第37组（Day 37）旅行词 ──
+{ word:'trip',   phonetic:'/trɪp/',    meaning:'旅行',          sentence:'I love a long road trip.',     highlight:'trip',   zh:'我喜欢长途公路旅行。' },
+{ word:'hotel',  phonetic:'/hoʊˈtel/', meaning:'酒店',          sentence:'I need a hotel near the city.',highlight:'hotel',  zh:'我需要一家城市附近的酒店。' },
+{ word:'train',  phonetic:'/treɪn/',   meaning:'火车',          sentence:'I take the train to the city.',highlight:'train',  zh:'我坐火车进城。' },
+{ word:'plane',  phonetic:'/pleɪn/',   meaning:'飞机',          sentence:'The plane is very fast.',      highlight:'plane',  zh:'飞机非常快。' },
+{ word:'bag',    phonetic:'/bæɡ/',     meaning:'行李包',        sentence:'My bag is too heavy.',         highlight:'bag',    zh:'我的包太重了。' },
+
+// ── 第38组（Day 38）网络数字生活 ──
+{ word:'check',  phonetic:'/tʃek/',    meaning:'检查 · 查看',   sentence:'Check your phone.',            highlight:'check',  zh:'查看一下你的手机。' },
+{ word:'look',   phonetic:'/lʊk/',     meaning:'看',            sentence:'Look at this it is good.',    highlight:'look',   zh:'看看这个，很好。' },
+{ word:'share',  phonetic:'/ʃer/',     meaning:'分享',          sentence:'Share your food with me.',     highlight:'share',  zh:'把你的食物分享给我。' },
+{ word:'save',   phonetic:'/seɪv/',    meaning:'保存 · 存钱',   sentence:'I want to save more money.',   highlight:'save',   zh:'我想存更多钱。' },
+{ word:'change', phonetic:'/tʃeɪndʒ/', meaning:'改变 · 换',     sentence:'I want to change my life.',    highlight:'change', zh:'我想改变我的生活。' },
+
+// ── 第39组（Day 39）表达意见 ──
+{ word:'agree',  phonetic:'/əˈɡriː/',  meaning:'同意',          sentence:'I agree with you.',            highlight:'agree',  zh:'我同意你的看法。' },
+{ word:'wrong',  phonetic:'/rɒŋ/',     meaning:'错误的',        sentence:'I think that is wrong.',       highlight:'wrong',  zh:'我认为那是错的。' },
+{ word:'right',  phonetic:'/raɪt/',    meaning:'正确的',        sentence:'You are right I agree.',      highlight:'right',  zh:'你是对的，我同意。' },
+{ word:'better', phonetic:'/ˈbetər/',  meaning:'更好',          sentence:'I feel much better today.',    highlight:'better', zh:'我今天感觉好多了。' },
+{ word:'best',   phonetic:'/best/',    meaning:'最好的',        sentence:'This is the best food here.',  highlight:'best',   zh:'这是这里最好的食物。' },
+
+// ── 第40组（Day 40）数量与程度 ──
+{ word:'too',    phonetic:'/tuː/',     meaning:'太 · 也',       sentence:'It is too hot to walk.',       highlight:'too',    zh:'太热了，没法走路。' },
+{ word:'quite',  phonetic:'/kwaɪt/',   meaning:'相当 · 挺',     sentence:'This is quite good.',          highlight:'quite',  zh:'这相当不错。' },
+{ word:'really', phonetic:'/ˈriːəli/', meaning:'真的 · 非常',   sentence:'I really need to sleep.',      highlight:'really', zh:'我真的需要睡觉了。' },
+{ word:'almost', phonetic:'/ˈɔːlmoʊst/',meaning:'几乎',         sentence:'I am almost ready to go.',     highlight:'almost', zh:'我几乎准备好出发了。' },
+{ word:'maybe',  phonetic:'/ˈmeɪbi/',  meaning:'也许',          sentence:'Maybe I should call him.',     highlight:'maybe',  zh:'也许我应该给他打个电话。' },
+
+// ── 第41组（Day 41）工作职业 ──
+{ word:'job',    phonetic:'/dʒɒb/',    meaning:'工作 · 职位',   sentence:'I love my job.',               highlight:'job',    zh:'我热爱我的工作。' },
+{ word:'boss',   phonetic:'/bɒs/',     meaning:'老板',          sentence:'My boss is very busy.',        highlight:'boss',   zh:'我的老板非常忙。' },
+{ word:'team',   phonetic:'/tiːm/',    meaning:'团队',          sentence:'Our team works very well.',    highlight:'team',   zh:'我们团队合作得很好。' },
+{ word:'meet',   phonetic:'/miːt/',    meaning:'开会 · 见面',   sentence:'We have a meeting today.',     highlight:'meet',   zh:'我们今天有个会议。' },
+{ word:'plan',   phonetic:'/plæn/',    meaning:'计划',          sentence:'What is your plan today?',     highlight:'plan',   zh:'你今天有什么计划？' },
+
+// ── 第42组（Day 42）学校用语 ──
+{ word:'class',  phonetic:'/klæs/',    meaning:'课程 · 班级',   sentence:'My class starts at nine.',     highlight:'class',  zh:'我的课九点开始。' },
+{ word:'test',   phonetic:'/test/',    meaning:'考试 · 测试',   sentence:'I need to study for the test.',highlight:'test',   zh:'我需要为考试学习。' },
+{ word:'answer', phonetic:'/ˈænsər/',  meaning:'回答',          sentence:'I do not know the answer.',    highlight:'answer', zh:'我不知道答案。' },
+{ word:'question',phonetic:'/ˈkwestʃən/',meaning:'问题',        sentence:'Can I ask a question?',        highlight:'question',zh:'我可以问个问题吗？' },
+{ word:'practice',phonetic:'/ˈpræktɪs/',meaning:'练习',         sentence:'Practice every day.',          highlight:'practice',zh:'每天都要练习。' },
+
+// ── 第43组（Day 43）约会社交 ──
+{ word:'party',  phonetic:'/ˈpɑːrti/', meaning:'派对 · 聚会',   sentence:'We have a party tonight.',     highlight:'party',  zh:'我们今晚有个聚会。' },
+{ word:'invite', phonetic:'/ɪnˈvaɪt/', meaning:'邀请',          sentence:'I want to invite my friends.', highlight:'invite', zh:'我想邀请我的朋友。' },
+{ word:'tonight',phonetic:'/təˈnaɪt/', meaning:'今晚',          sentence:'What are you doing tonight?',  highlight:'tonight',zh:'你今晚有什么打算？' },
+{ word:'together',phonetic:'/təˈɡeðər/',meaning:'一起',         sentence:'Let us eat together tonight.', highlight:'together',zh:'我们今晚一起吃饭吧。' },
+{ word:'alone',  phonetic:'/əˈloʊn/',  meaning:'独自',          sentence:'I do not like to eat alone.',  highlight:'alone',  zh:'我不喜欢独自吃饭。' },
+
+// ── 第44组（Day 44）健康生活 ──
+{ word:'exercise',phonetic:'/ˈeksərsaɪz/',meaning:'运动',       sentence:'Exercise is good for you.',    highlight:'exercise',zh:'运动对你有好处。' },
+{ word:'rest',   phonetic:'/rest/',    meaning:'休息',          sentence:'I need to rest after work.',   highlight:'rest',   zh:'我需要下班后休息。' },
+{ word:'drink',  phonetic:'/drɪŋk/',   meaning:'喝',            sentence:'Drink enough water every day.',highlight:'drink',  zh:'每天喝足够的水。' },
+{ word:'pain',   phonetic:'/peɪn/',    meaning:'疼痛',          sentence:'I have pain in my back.',      highlight:'pain',   zh:'我背部疼。' },
+{ word:'medicine',phonetic:'/ˈmedɪsɪn/',meaning:'药',           sentence:'I need to take medicine.',     highlight:'medicine',zh:'我需要吃药。' },
+
+// ── 第45组（Day 45）餐厅点餐 ──
+{ word:'order',  phonetic:'/ˈɔːrdər/', meaning:'点餐 · 命令',   sentence:'Can I order some food?',       highlight:'order',  zh:'我可以点餐吗？' },
+{ word:'menu',   phonetic:'/ˈmenjuː/', meaning:'菜单',          sentence:'Can I see the menu?',          highlight:'menu',   zh:'我可以看菜单吗？' },
+{ word:'delicious',phonetic:'/dɪˈlɪʃəs/',meaning:'美味的',      sentence:'This food is delicious.',      highlight:'delicious',zh:'这食物很美味。' },
+{ word:'hungry', phonetic:'/ˈhʌŋɡri/', meaning:'饥饿的',        sentence:'I am hungry let us eat.',     highlight:'hungry', zh:'我饿了，我们去吃吧。' },
+{ word:'full',   phonetic:'/fʊl/',     meaning:'饱的 · 满的',   sentence:'I am full thank you.',        highlight:'full',   zh:'我吃饱了，谢谢。' },
+
+// ── 第46组（Day 46）情感表达 ──
+{ word:'thank',  phonetic:'/θæŋk/',    meaning:'感谢',          sentence:'Thank you for your help.',     highlight:'thank',  zh:'感谢你的帮助。' },
+{ word:'please', phonetic:'/pliːz/',   meaning:'请',            sentence:'Please give me some water.',   highlight:'please', zh:'请给我一些水。' },
+{ word:'welcome',phonetic:'/ˈwelkəm/', meaning:'欢迎',          sentence:'You are welcome here.',        highlight:'welcome',zh:'欢迎你来这里。' },
+{ word:'miss',   phonetic:'/mɪs/',     meaning:'想念 · 错过',   sentence:'I miss my family.',            highlight:'miss',   zh:'我想念我的家人。' },
+{ word:'care',   phonetic:'/ker/',     meaning:'关心 · 在乎',   sentence:'I care about you.',            highlight:'care',   zh:'我关心你。' },
+
+// ── 第47组（Day 47）购物衣物 ──
+{ word:'wear',   phonetic:'/wer/',     meaning:'穿 · 戴',       sentence:'What should I wear today?',    highlight:'wear',   zh:'我今天应该穿什么？' },
+{ word:'clothes',phonetic:'/kloʊðz/',  meaning:'衣服',          sentence:'I want to buy new clothes.',   highlight:'clothes',zh:'我想买新衣服。' },
+{ word:'shoe',   phonetic:'/ʃuː/',     meaning:'鞋子',          sentence:'These shoes are too small.',   highlight:'shoe',   zh:'这双鞋太小了。' },
+{ word:'size',   phonetic:'/saɪz/',    meaning:'尺码 · 大小',   sentence:'What size do you wear?',       highlight:'size',   zh:'你穿什么尺码？' },
+{ word:'color',  phonetic:'/ˈkʌlər/',  meaning:'颜色',          sentence:'I like this color.',           highlight:'color',  zh:'我喜欢这个颜色。' },
+
+// ── 第48组（Day 48）房屋家居 ──
+{ word:'door',   phonetic:'/dɔːr/',    meaning:'门',            sentence:'Please close the door.',       highlight:'door',   zh:'请关门。' },
+{ word:'window', phonetic:'/ˈwɪndoʊ/', meaning:'窗户',          sentence:'Open the window please.',      highlight:'window', zh:'请打开窗户。' },
+{ word:'bed',    phonetic:'/bed/',     meaning:'床',            sentence:'I want to go to bed early.',   highlight:'bed',    zh:'我想早点上床睡觉。' },
+{ word:'kitchen',phonetic:'/ˈkɪtʃɪn/', meaning:'厨房',          sentence:'I cook in the kitchen.',       highlight:'kitchen',zh:'我在厨房做饭。' },
+{ word:'floor',  phonetic:'/flɔːr/',   meaning:'地板 · 楼层',   sentence:'Sit on the floor.',            highlight:'floor',  zh:'坐在地板上。' },
+
+// ── 第49组（Day 49）烹饪饮食 ──
+{ word:'cook',   phonetic:'/kʊk/',     meaning:'烹饪',          sentence:'I like to cook at home.',      highlight:'cook',   zh:'我喜欢在家做饭。' },
+{ word:'taste',  phonetic:'/teɪst/',   meaning:'味道 · 尝',     sentence:'Taste this it is delicious.', highlight:'taste',  zh:'尝一下这个，很美味。' },
+{ word:'meat',   phonetic:'/miːt/',    meaning:'肉',            sentence:'I do not eat much meat.',      highlight:'meat',   zh:'我不吃很多肉。' },
+{ word:'milk',   phonetic:'/mɪlk/',    meaning:'牛奶',          sentence:'Drink your milk every day.',   highlight:'milk',   zh:'每天喝牛奶。' },
+{ word:'tea',    phonetic:'/tiː/',     meaning:'茶',            sentence:'I drink tea in the morning.',  highlight:'tea',    zh:'我早上喝茶。' },
+
+// ── 第50组（Day 50）成长与目标 ──
+{ word:'dream',  phonetic:'/driːm/',   meaning:'梦想 · 梦',     sentence:'I dream of a better life.',    highlight:'dream',  zh:'我梦想过上更好的生活。' },
+{ word:'goal',   phonetic:'/ɡoʊl/',    meaning:'目标',          sentence:'My goal is to learn English.', highlight:'goal',   zh:'我的目标是学好英语。' },
+{ word:'grow',   phonetic:'/ɡroʊ/',    meaning:'成长 · 增长',   sentence:'I want to grow every day.',    highlight:'grow',   zh:'我想每天都有所成长。' },
+{ word:'believe',phonetic:'/bɪˈliːv/', meaning:'相信',          sentence:'I believe I can do this.',     highlight:'believe',zh:'我相信我能做到。' },
+{ word:'proud',  phonetic:'/praʊd/',   meaning:'自豪的',        sentence:'I am proud of my family.',     highlight:'proud',  zh:'我为我的家人感到自豪。' },
+
+// ── 第51组（Day 51）社交礼貌 ──
+{ word:'excuse', phonetic:'/ɪkˈskjuːz/',meaning:'打扰 · 借过',  sentence:'Excuse me where is the bank?',highlight:'excuse', zh:'打扰一下，银行在哪里？' },
+{ word:'please', phonetic:'/pliːz/',   meaning:'请',            sentence:'Please help me find this.',    highlight:'please', zh:'请帮我找一下这个。' },
+{ word:'sorry',  phonetic:'/ˈsɒri/',   meaning:'对不起',        sentence:'Sorry I was wrong.',          highlight:'sorry',  zh:'对不起，我错了。' },
+{ word:'hello',  phonetic:'/həˈloʊ/',  meaning:'你好',          sentence:'Say hello to your mother.',    highlight:'hello',  zh:'代我向你妈妈问好。' },
+{ word:'goodbye',phonetic:'/ˌɡʊdˈbaɪ/',meaning:'再见',          sentence:'Goodbye see you tomorrow.',   highlight:'goodbye',zh:'再见，明天见。' },
+
+// ── 第52组（Day 52）网络与科技 ──
+{ word:'internet',phonetic:'/ˈɪntərnet/',meaning:'网络',         sentence:'I use the internet every day.',highlight:'internet',zh:'我每天都使用网络。' },
+{ word:'message',phonetic:'/ˈmesɪdʒ/', meaning:'消息',          sentence:'Send me a message tonight.',   highlight:'message', zh:'今晚给我发条消息。' },
+{ word:'photo',  phonetic:'/ˈfoʊtoʊ/', meaning:'照片',          sentence:'I love this photo.',           highlight:'photo',  zh:'我喜欢这张照片。' },
+{ word:'video',  phonetic:'/ˈvɪdioʊ/', meaning:'视频',          sentence:'Watch this video with me.',    highlight:'video',  zh:'和我一起看这个视频。' },
+{ word:'music',  phonetic:'/ˈmjuːzɪk/',meaning:'音乐',          sentence:'I listen to music every day.', highlight:'music',  zh:'我每天听音乐。' },
+
+// ── 第53组（Day 53）描述人 ──
+{ word:'tall',   phonetic:'/tɔːl/',    meaning:'高的',          sentence:'He is very tall.',             highlight:'tall',   zh:'他非常高。' },
+{ word:'young',  phonetic:'/jʌŋ/',     meaning:'年轻的',        sentence:'She looks young and happy.',   highlight:'young',  zh:'她看起来年轻又快乐。' },
+{ word:'smart',  phonetic:'/smɑːrt/',  meaning:'聪明的',        sentence:'She is very smart.',           highlight:'smart',  zh:'她非常聪明。' },
+{ word:'kind',   phonetic:'/kaɪnd/',   meaning:'友善的 · 种类', sentence:'Be kind to people.',           highlight:'kind',   zh:'对人要友善。' },
+{ word:'funny',  phonetic:'/ˈfʌni/',   meaning:'有趣的 · 好笑', sentence:'He is so funny.',              highlight:'funny',  zh:'他太有趣了。' },
+
+// ── 第54组（Day 54）问路与方向 ──
+{ word:'street', phonetic:'/striːt/',  meaning:'街道',          sentence:'Walk down this street.',       highlight:'street', zh:'沿着这条街走。' },
+{ word:'turn',   phonetic:'/tɜːrn/',   meaning:'转弯',          sentence:'Turn left at the next street.',highlight:'turn',   zh:'在下一条街左转。' },
+{ word:'cross',  phonetic:'/krɒs/',    meaning:'穿过',          sentence:'Cross the road carefully.',    highlight:'cross',  zh:'小心穿过马路。' },
+{ word:'far',    phonetic:'/fɑːr/',    meaning:'远',            sentence:'Is the bank far from here?',   highlight:'far',    zh:'银行离这里远吗？' },
+{ word:'next',   phonetic:'/nekst/',   meaning:'下一个 · 旁边', sentence:'The store is next to the bank.',highlight:'next',  zh:'商店就在银行旁边。' },
+
+// ── 第55组（Day 55）表达时间 ──
+{ word:'morning',phonetic:'/ˈmɔːrnɪŋ/',meaning:'早上',          sentence:'I run every morning.',         highlight:'morning',zh:'我每天早上跑步。' },
+{ word:'night',  phonetic:'/naɪt/',    meaning:'晚上',          sentence:'Good night sleep well.',      highlight:'night',  zh:'晚安，睡个好觉。' },
+{ word:'hour',   phonetic:'/ˈaʊər/',   meaning:'小时',          sentence:'I work eight hours a day.',    highlight:'hour',   zh:'我一天工作八小时。' },
+{ word:'minute', phonetic:'/ˈmɪnɪt/',  meaning:'分钟',          sentence:'Wait five minutes.',           highlight:'minute', zh:'等五分钟。' },
+{ word:'moment', phonetic:'/ˈmoʊmənt/',meaning:'片刻 · 一会儿', sentence:'Give me a moment.',            highlight:'moment', zh:'给我一点时间。' },
+
+// ── 第56组（Day 56）季节与节日 ──
+{ word:'spring', phonetic:'/sprɪŋ/',   meaning:'春天',          sentence:'I love spring weather.',       highlight:'spring', zh:'我喜欢春天的天气。' },
+{ word:'summer', phonetic:'/ˈsʌmər/',  meaning:'夏天',          sentence:'Summer is too hot for me.',    highlight:'summer', zh:'夏天对我来说太热了。' },
+{ word:'holiday',phonetic:'/ˈhɒlɪdeɪ/',meaning:'假期',          sentence:'I will visit family on holiday.',highlight:'holiday',zh:'假期我会去探望家人。' },
+{ word:'special',phonetic:'/ˈspeʃəl/', meaning:'特别的',        sentence:'Today is a special day.',      highlight:'special',zh:'今天是个特别的日子。' },
+{ word:'enjoy',  phonetic:'/ɪnˈdʒɔɪ/', meaning:'享受 · 过得愉快',sentence:'Enjoy your holiday.',         highlight:'enjoy',  zh:'好好享受你的假期。' },
+
+// ── 第57组（Day 57）动词拓展 ──
+{ word:'lose',   phonetic:'/luːz/',    meaning:'失去 · 输',     sentence:'I do not want to lose time.',  highlight:'lose',   zh:'我不想浪费时间。' },
+{ word:'win',    phonetic:'/wɪn/',     meaning:'赢',            sentence:'I want to win this.',          highlight:'win',    zh:'我想赢得这个。' },
+{ word:'help',   phonetic:'/help/',    meaning:'帮助',          sentence:'Let me help you with that.',   highlight:'help',   zh:'让我帮你做那个。' },
+{ word:'choose', phonetic:'/tʃuːz/',   meaning:'选择',          sentence:'Choose the best one.',         highlight:'choose', zh:'选择最好的那个。' },
+{ word:'decide', phonetic:'/dɪˈsaɪd/', meaning:'决定',          sentence:'I cannot decide what to eat.', highlight:'decide', zh:'我无法决定吃什么。' },
+
+// ── 第58组（Day 58）形容词拓展 ──
+{ word:'tired',  phonetic:'/ˈtaɪərd/', meaning:'疲惫的',        sentence:'I am tired after a long day.', highlight:'tired',  zh:'经过漫长一天后我很疲惫。' },
+{ word:'excited',phonetic:'/ɪkˈsaɪtɪd/',meaning:'兴奋的',       sentence:'I am excited about the trip.', highlight:'excited',zh:'我对这次旅行感到兴奋。' },
+{ word:'afraid', phonetic:'/əˈfreɪd/', meaning:'害怕的',        sentence:'Do not be afraid to try.',     highlight:'afraid', zh:'不要害怕尝试。' },
+{ word:'angry',  phonetic:'/ˈæŋɡri/',  meaning:'生气的',        sentence:'Why are you angry?',           highlight:'angry',  zh:'你为什么生气？' },
+{ word:'calm',   phonetic:'/kɑːm/',    meaning:'冷静的',        sentence:'Stay calm and think.',         highlight:'calm',   zh:'保持冷静，好好想想。' },
+
+// ── 第59组（Day 59）自然环境 ──
+{ word:'tree',   phonetic:'/triː/',    meaning:'树',            sentence:'Sit under the tree and rest.', highlight:'tree',   zh:'坐在树下休息。' },
+{ word:'river',  phonetic:'/ˈrɪvər/',  meaning:'河流',          sentence:'The river near the city.',     highlight:'river',  zh:'城市附近的河流。' },
+{ word:'sky',    phonetic:'/skaɪ/',    meaning:'天空',          sentence:'The sky is very blue today.',  highlight:'sky',    zh:'今天天空非常蓝。' },
+{ word:'flower', phonetic:'/ˈflaʊər/', meaning:'花',            sentence:'I want to buy flowers.',       highlight:'flower', zh:'我想买花。' },
+{ word:'sea',    phonetic:'/siː/',     meaning:'大海',          sentence:'I love the sea.',              highlight:'sea',    zh:'我热爱大海。' },
+
+// ── 第60组（Day 60）总结收尾 ──
+{ word:'beautiful',phonetic:'/ˈbjuːtɪfl/',meaning:'美丽的',     sentence:'This is a beautiful place.',   highlight:'beautiful',zh:'这是一个美丽的地方。' },
+{ word:'wonderful',phonetic:'/ˈwʌndərfl/',meaning:'美妙的',     sentence:'You are wonderful thank you.',highlight:'wonderful',zh:'你太棒了，谢谢。' },
+{ word:'important',phonetic:'/ɪmˈpɔːrtənt/',meaning:'重要的',   sentence:'Family is very important.',    highlight:'important',zh:'家人非常重要。' },
+{ word:'possible',phonetic:'/ˈpɒsɪbl/', meaning:'可能的',       sentence:'It is possible if you try.',   highlight:'possible',zh:'如果你努力，一切皆有可能。' },
+{ word:'perfect', phonetic:'/ˈpɜːrfɪkt/',meaning:'完美的',      sentence:'This is perfect I love it.',  highlight:'perfect', zh:'这太完美了，我很喜欢。' },
+];
+
+// ─── SPEECH（多重方案，兼容华为浏览器）────────────────────────────
+// 单词：有道 TTS（专为单词设计，发音准，国内快）→ Web Speech
+// 例句：Google TTS（对句子最稳定）→ 有道 TTS → Web Speech
+// 根本原因：有道 TTS 是「词典发音」接口，对完整句子支持不稳定
+
+let currentBtn = null;
+let currentAudio = null;
+
+function stopCurrent() {
+  if (currentBtn) { currentBtn.classList.remove('playing'); currentBtn = null; }
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ''; currentAudio = null; }
+  try { speechSynthesis.cancel(); } catch(e) {}
+}
+
+// isWord=true 走单词链，false 走句子链
+function speak(text, btn, isWord) {
+  stopCurrent();
+  if (btn) { btn.classList.add('playing'); currentBtn = btn; }
+
+  const onDone = () => {
+    if (btn) btn.classList.remove('playing');
+    if (currentBtn === btn) currentBtn = null;
+  };
+
+  function tryWebSpeech() {
+    if (!window.speechSynthesis) { onDone(); return; }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = isWord ? 0.8 : 0.85; u.pitch = 1.05; u.volume = 1;
+    u.onend = onDone; u.onerror = onDone;
+    function go() {
+      const vs = speechSynthesis.getVoices();
+      const v = vs.find(v => v.lang === 'en-US' && v.name.includes('Google'))
+             || vs.find(v => v.lang === 'en-US')
+             || vs.find(v => v.lang.startsWith('en'));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    }
+    speechSynthesis.getVoices().length === 0
+      ? (speechSynthesis.onvoiceschanged = go) : go();
+  }
+
+  if (isWord) {
+    // 单词：直接用有道词典接口，收录了标准美式发音
+    const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(text) + '&type=2';
+    playAudio(url, tryWebSpeech, onDone, 5000);
+  } else {
+    // 句子：全部用有道整句，长句拆两段（每段≤20字符），彻底解决逐词男女声问题
+    function youdaoPlay(phrase, callback) {
+      // 去掉末尾标点，有道对带标点的句子随机失败
+      const clean = phrase.replace(/[.?!,;:]+$/g, '').trim();
+      const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(clean) + '&type=2';
+      playAudio(url, callback, callback, 5000);
+    }
+
+    if (text.length <= 20) {
+      youdaoPlay(text, onDone);
+    } else {
+      // 找最佳断点，使两段都≤20字符
+      const words = text.split(' ');
+      let part1 = '', part2 = '';
+      for (let cut = 1; cut < words.length; cut++) {
+        const p1 = words.slice(0, cut).join(' ');
+        const p2 = words.slice(cut).join(' ');
+        if (p1.length <= 20 && p2.length <= 20) {
+          part1 = p1; part2 = p2; break;
+        }
+      }
+      if (part1) {
+        // 两段依次播放，中间停顿200ms
+        youdaoPlay(part1, () => setTimeout(() => youdaoPlay(part2, onDone), 200));
+      } else {
+        // 极端情况降级逐词
+        const ws = text.match(/[a-zA-Z]+/g) || [];
+        let i = 0;
+        function playNext() {
+          if (i >= ws.length) { onDone(); return; }
+          const w = ws[i++];
+          playAudio('https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(w) + '&type=2',
+            () => setTimeout(playNext, 150), () => setTimeout(playNext, 150), 4000);
+        }
+        playNext();
+      }
+    }
+  }
+}
+
+function playAudio(url, onFail, onDone, timeout) {
+  const audio = new Audio();
+  currentAudio = audio;
+  let done = false;
+
+  const finish = (ok) => {
+    if (done) return; done = true;
+    audio.pause(); audio.src = '';
+    if (currentAudio === audio) currentAudio = null;
+    ok ? onDone() : onFail();
+  };
+
+  audio.onended = () => finish(true);
+  audio.onerror = () => finish(false);
+
+  // 超时：到时间还没开始播就换下一个方案
+  const timer = setTimeout(() => finish(false), timeout || 5000);
+  // 一旦可以播放就取消超时倒计时
+  audio.oncanplay = () => clearTimeout(timer);
+
+  audio.src = url;
+  audio.load();
+  audio.play().catch(() => finish(false));
+}
+
+// ─── DATE & SELECTION ────────────────────────────────────────────
+function getDayIndex() {
+  const start = new Date('2026-05-29');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = Math.floor((today - start) / 86400000);
+  return d < 0 ? 0 : d;  // 时区差异导致负数时归零
+}
+
+// JS取模安全版（负数也返回正数）
+function mod(a, n) { return ((a % n) + n) % n; }
+
+function getTodayWords() {
+  const day = getDayIndex();
+  const n = WORDS.length;
+  const si = mod(day * 5, n);
+  const main = Array.from({length:5}, (_,i) => WORDS[mod(si+i, n)]);
+  const review = [
+    WORDS[mod(si + 7, n)],
+    WORDS[mod(si + 13, n)],
+  ];
+  return { main, review };
+}
+
+// ─── HIGHLIGHT ───────────────────────────────────────────────────
+function buildSentence(sentence, highlight) {
+  return sentence.replace(new RegExp('(\\b' + highlight + '\\b)', 'i'),
+    '<span class="highlight">$1</span>');
+}
+
+// ─── CREATE CARD ─────────────────────────────────────────────────
+let cc = 0;
+function createCard(item, index, total) {
+  cc++;
+  const div = document.createElement('div');
+  div.className = 'card';
+  const wId = 'w'+cc, sId = 's'+cc;
+  const esc = s => s.replace(/'/g, "\\'");
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="word">${item.word}</div>
+      <div class="card-num">${String(index+1).padStart(2,'0')} / ${String(total).padStart(2,'0')}</div>
+    </div>
+    <div class="phonetic">${item.phonetic}</div>
+    <div class="meaning-tag">${item.meaning}</div>
+    <div class="divider"></div>
+    <div class="sentence-en">${buildSentence(item.sentence, item.highlight)}</div>
+    <div class="sentence-zh">${item.zh}</div>
+    <div class="btn-group">
+      <button class="btn btn-word" id="${wId}" onclick="speak('${esc(item.word)}',document.getElementById('${wId}'),true)">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>听单词
+      </button>
+      <button class="btn btn-sent" id="${sId}" onclick="speak('${esc(item.sentence)}',document.getElementById('${sId}'),false)">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>听例句
+      </button>
+    </div>`;
+  return div;
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────
+function render() {
+  const { main, review } = getTodayWords();
+  const todayEl = document.getElementById('todayCards');
+  const reviewEl = document.getElementById('reviewCards');
+  main.forEach((w,i) => todayEl.appendChild(createCard(w, i, main.length)));
+  review.forEach((w,i) => reviewEl.appendChild(createCard(w, i, review.length)));
+
+  const day = getDayIndex();
+  const groupTotal = Math.ceil(WORDS.length / 5);
+  const groupIndex = (day % groupTotal) + 1;
+  document.getElementById('progressFill').style.width = (groupIndex / groupTotal * 100) + '%';
+  document.getElementById('progressLabel').textContent = `第 ${groupIndex} 组 / 共 ${groupTotal} 组 · ${WORDS.length} 词总库`;
+
+  const d = new Date();
+  const months = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
+  document.getElementById('dateStr').textContent =
+    `${d.getFullYear()} 年 ${months[d.getMonth()]} 月 ${d.getDate()} 日`;
+
+  updateStreak();
+}
+
+function updateStreak() {
+  const key = 'eng_streak';
+  const today = new Date().toDateString();
+  let data = { streak:0, last:'', total:0 };
+  try { data = JSON.parse(localStorage.getItem(key)) || data; } catch(e){}
+  if (data.last !== today) {
+    const yesterday = new Date(Date.now()-86400000).toDateString();
+    data.streak = data.last === yesterday ? data.streak+1 : 1;
+    data.last = today;
+    data.total = (data.total||0) + 5;
+    try { localStorage.setItem(key, JSON.stringify(data)); } catch(e){}
+  }
+  document.getElementById('streakDays').textContent = data.streak;
+  document.getElementById('totalWords').textContent = data.total;
+}
+
+render();
+</script>
+</body>
+</html>
