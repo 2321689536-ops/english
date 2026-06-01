@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TTS诊断 v6</title>
+<style>
+  body{font-family:sans-serif;padding:16px;background:#f5f5f5;}
+  .group{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);}
+  h3{font-size:13px;color:#888;margin-bottom:12px;}
+  .btn{display:block;width:100%;padding:14px 16px;margin-bottom:10px;border:none;border-radius:12px;background:#1a1a2e;color:#fff;font-size:14px;text-align:left;cursor:pointer;}
+  .btn.ok{background:#16a34a;} .btn.fail{background:#dc2626;} .btn.run{background:#d97706;}
+  .log{background:#111;color:#0f0;font-size:11px;font-family:monospace;padding:12px;border-radius:10px;min-height:100px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<h2 style="margin-bottom:4px">TTS诊断 v6</h2>
+<p style="color:#888;font-size:13px;margin-bottom:16px">用<b>华为浏览器</b>从github.io打开，依次点击</p>
+
+<div class="group">
+  <h3>单词播放（已知可用）</h3>
+  <button class="btn" onclick="playWord(this,'know')">① 单词 know</button>
+  <button class="btn" onclick="playWord(this,'your')">② 单词 your</button>
+  <button class="btn" onclick="playWord(this,'name')">③ 单词 name</button>
+</div>
+
+<div class="group">
+  <h3>playAudio函数测试（主应用用的函数）</h3>
+  <button class="btn" onclick="testPlayAudio(this,'know')">④ playAudio: know</button>
+  <button class="btn" onclick="testPlayAudio(this,'your')">⑤ playAudio: your</button>
+</div>
+
+<div class="group">
+  <h3>逐词播放测试</h3>
+  <button class="btn" onclick="testSeq1(this)">⑥ 顺序逐词: I know your name（无延迟）</button>
+  <button class="btn" onclick="testSeq2(this)">⑦ 顺序逐词: I know your name（100ms延迟）</button>
+  <button class="btn" onclick="testSeq3(this)">⑧ 顺序逐词: I know your name（300ms延迟）</button>
+</div>
+
+<div class="group">
+  <h3>playAudio回调测试（检查onFail/onDone是否正确触发）</h3>
+  <button class="btn" onclick="testCallback(this)">⑨ 测试playAudio回调链</button>
+</div>
+
+<div class="group">
+  <h3>诊断日志</h3>
+  <div class="log" id="log">等待...</div>
+  <button class="btn" style="background:#374151;margin-top:8px" onclick="document.getElementById('log').textContent=''">清空</button>
+</div>
+
+<script>
+const log = document.getElementById('log');
+function L(m){ log.textContent += new Date().toLocaleTimeString()+' '+m+'\n'; log.scrollTop=9999; }
+
+let currentAudio = null;
+function stopAll(){ if(currentAudio){ try{currentAudio.pause();currentAudio.src='';}catch(e){} currentAudio=null; } }
+
+// 主应用里的 playAudio 函数（完全一致）
+function playAudio(url, onFail, onDone, timeout) {
+  const audio = new Audio();
+  currentAudio = audio;
+  let done = false;
+  const finish = (ok) => {
+    if (done) return; done = true;
+    audio.pause(); audio.src = '';
+    if (currentAudio === audio) currentAudio = null;
+    L('  finish: ok='+ok);
+    ok ? onDone() : onFail();
+  };
+  audio.onended  = () => finish(true);
+  audio.onerror  = () => { L('  onerror code='+(audio.error?audio.error.code:'?')); finish(false); };
+  audio.oncanplay= () => { L('  canplay'); clearTimeout(timer); };
+  audio.onplay   = () => L('  onplay');
+  audio.onplaying= () => L('  onplaying');
+  audio.onstalled= () => L('  stalled');
+  audio.onabort  = () => L('  abort');
+  const timer = setTimeout(() => { L('  timeout '+timeout+'ms'); finish(false); }, timeout || 5000);
+  audio.src = url;
+  L('  src set, calling play()...');
+  audio.play().catch(e => { L('  play() rejected: '+e.message); finish(false); });
+}
+
+// 简单Audio播放（不用playAudio）
+function playWord(btn, word) {
+  stopAll();
+  const orig = btn.textContent;
+  btn.className='btn run';
+  L('直接Audio播放: '+word);
+  const url = 'https://dict.youdao.com/dictvoice?audio='+word+'&type=2';
+  const a = new Audio(); currentAudio = a;
+  let done = false;
+  const fin = (ok) => {
+    if(done)return; done=true;
+    btn.className='btn '+(ok?'ok':'fail');
+    btn.textContent=(ok?'✅ ':'❌ ')+orig;
+    L((ok?'✅':'❌')+' '+word);
+  };
+  a.onplaying = () => { btn.textContent='🔊 '+orig; L('  playing'); };
+  a.onended = () => fin(true);
+  a.onerror = () => fin(false);
+  setTimeout(()=>fin(false), 5000);
+  a.src=url; a.play().catch(()=>fin(false));
+}
+
+// 用playAudio播单词
+function testPlayAudio(btn, word) {
+  stopAll();
+  const orig = btn.textContent;
+  btn.className='btn run';
+  L('playAudio播放: '+word);
+  const url = 'https://dict.youdao.com/dictvoice?audio='+word+'&type=2';
+  playAudio(url,
+    () => { btn.className='btn fail'; btn.textContent='❌ '+orig; L('❌ onFail触发'); },
+    () => { btn.className='btn ok';   btn.textContent='✅ '+orig; L('✅ onDone触发'); },
+    5000
+  );
+}
+
+// 逐词播放（主应用的逻辑）
+function makeSeq(btn, delay) {
+  stopAll();
+  const orig = btn.textContent;
+  btn.className='btn run';
+  L('逐词播放 delay='+delay+'ms: I know your name');
+  const words = ['I','know','your','name'];
+  let i = 0;
+  function playNext() {
+    if (i >= words.length) {
+      btn.className='btn ok'; btn.textContent='✅ '+orig;
+      L('✅ 全部完成'); return;
+    }
+    const w = words[i++];
+    L('播第'+i+'词: '+w);
+    const url = 'https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(w)+'&type=2';
+    playAudio(url,
+      () => { L('  onFail→next'); setTimeout(playNext, delay); },
+      () => { L('  onDone→next'); setTimeout(playNext, delay); },
+      4000
+    );
+  }
+  playNext();
+}
+
+function testSeq1(btn){ makeSeq(btn, 0); }
+function testSeq2(btn){ makeSeq(btn, 100); }
+function testSeq3(btn){ makeSeq(btn, 300); }
+
+// 测试回调链是否正常
+function testCallback(btn) {
+  stopAll();
+  const orig = btn.textContent;
+  btn.className='btn run';
+  L('测试回调链...');
+  const url = 'https://dict.youdao.com/dictvoice?audio=hello&type=2';
+  playAudio(url,
+    () => { L('onFail被调用'); btn.className='btn fail'; btn.textContent='❌ onFail'; },
+    () => { L('onDone被调用'); btn.className='btn ok'; btn.textContent='✅ onDone'; },
+    5000
+  );
+}
+
+window.onload = () => {
+  L('域名: '+location.hostname);
+  L('UA: '+navigator.userAgent.substring(0,80));
+};
+</script>
+</body>
+</html>
