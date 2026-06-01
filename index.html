@@ -767,43 +767,39 @@ function speak(text, btn, isWord) {
     const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(text) + '&type=2';
     playAudio(url, tryWebSpeech, onDone, 5000);
   } else {
-    // 句子：全部用有道整句，长句拆两段（每段≤20字符），彻底解决逐词男女声问题
-    function youdaoPlay(phrase, callback) {
-      // 去掉末尾标点，有道对带标点的句子随机失败
-      const clean = phrase.replace(/[.?!,;:]+$/g, '').trim();
-      const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(clean) + '&type=2';
-      playAudio(url, callback, callback, 5000);
-    }
+    // 句子：用 AudioContext 把每个词无缝拼接播放（无停顿感）
+    const words = text.replace(/[.?!,;:]+/g, '').trim().split(/\s+/);
+    if (words.length === 0) { onDone(); return; }
 
-    if (text.length <= 20) {
-      youdaoPlay(text, onDone);
-    } else {
-      // 找最佳断点，使两段都≤20字符
-      const words = text.split(' ');
-      let part1 = '', part2 = '';
-      for (let cut = 1; cut < words.length; cut++) {
-        const p1 = words.slice(0, cut).join(' ');
-        const p2 = words.slice(cut).join(' ');
-        if (p1.length <= 20 && p2.length <= 20) {
-          part1 = p1; part2 = p2; break;
-        }
-      }
-      if (part1) {
-        // 两段依次播放，中间停顿200ms
-        youdaoPlay(part1, () => setTimeout(() => youdaoPlay(part2, onDone), 200));
-      } else {
-        // 极端情况降级逐词
-        const ws = text.match(/[a-zA-Z]+/g) || [];
-        let i = 0;
-        function playNext() {
-          if (i >= ws.length) { onDone(); return; }
-          const w = ws[i++];
-          playAudio('https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(w) + '&type=2',
-            () => setTimeout(playNext, 150), () => setTimeout(playNext, 150), 4000);
-        }
-        playNext();
-      }
-    }
+    // 并行下载所有词的音频
+    const fetchWord = (w) => {
+      const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(w) + '&type=2';
+      return fetch(url).then(r => r.arrayBuffer()).catch(() => null);
+    };
+
+    Promise.all(words.map(fetchWord)).then(buffers => {
+      // 过滤掉下载失败的
+      const valid = buffers.filter(b => b && b.byteLength > 100);
+      if (valid.length === 0) { onDone(); return; }
+
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // 并行解码所有 ArrayBuffer
+      Promise.all(valid.map(buf => ctx.decodeAudioData(buf.slice(0)))).then(audioBuffers => {
+        let startTime = ctx.currentTime + 0.05;
+        audioBuffers.forEach(ab => {
+          const source = ctx.createBufferSource();
+          source.buffer = ab;
+          source.connect(ctx.destination);
+          source.start(startTime);
+          startTime += ab.duration + 0.08; // 词间加80ms自然停顿
+        });
+        // 最后一个词结束后调用 onDone
+        const lastDuration = startTime - ctx.currentTime;
+        setTimeout(() => { ctx.close(); onDone(); }, lastDuration * 1000 + 200);
+        if (btn) btn.classList.remove('playing');
+      }).catch(() => onDone());
+    }).catch(() => onDone());
   }
 }
 
