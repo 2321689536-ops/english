@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>연속재생 테스트</title>
+<style>
+  body{font-family:sans-serif;padding:16px;background:#f5f5f5;}
+  .btn{display:block;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:12px;background:#1a1a2e;color:#fff;font-size:14px;cursor:pointer;}
+  .btn.ok{background:#16a34a;} .btn.fail{background:#dc2626;}
+  .log{background:#111;color:#0f0;font-size:11px;font-family:monospace;padding:12px;border-radius:10px;min-height:150px;white-space:pre-wrap;max-height:400px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<h2 style="margin-bottom:16px">连读测试</h2>
+
+<button class="btn" onclick="testLocal(this)">① 本地音频连读: I know your name</button>
+<button class="btn" onclick="testSpeak(this)">② 模拟主应用speak函数</button>
+
+<div class="log" id="log">等待...</div>
+<button class="btn" style="background:#374151;margin-top:8px" onclick="document.getElementById('log').textContent=''">清空</button>
+
+<script>
+const log=document.getElementById('log');
+function L(m){log.textContent+=new Date().toLocaleTimeString()+'.'+String(new Date().getMilliseconds()).padStart(3,'0')+' '+m+'\n';log.scrollTop=9999;}
+
+let currentAudio=null, currentBtn=null;
+
+function stopCurrent(){
+  if(currentBtn){currentBtn.classList.remove('playing');currentBtn=null;}
+  if(currentAudio){try{currentAudio.pause();currentAudio.src='';}catch(e){}currentAudio=null;}
+}
+
+function playAudio(url, onFail, onDone, timeout){
+  const audio=new Audio();
+  currentAudio=audio;
+  let done=false;
+  const finish=(ok)=>{
+    if(done)return;done=true;
+    audio.pause();audio.src='';
+    if(currentAudio===audio)currentAudio=null;
+    L('  finish: '+(ok?'onDone':'onFail'));
+    ok?onDone():onFail();
+  };
+  audio.onended=()=>finish(true);
+  audio.onerror=()=>{L('  onerror code='+(audio.error?audio.error.code:'?'));finish(false);};
+  const timer=setTimeout(()=>{L('  timeout '+timeout+'ms');finish(false);},timeout||5000);
+  audio.oncanplay=()=>{L('  canplay');clearTimeout(timer);};
+  audio.onplaying=()=>L('  playing');
+  audio.src=url;
+  audio.play().catch(e=>{L('  play rejected: '+e.message);finish(false);});
+}
+
+// 테스트1: 단순 로컬 오디오 연속 재생
+function testLocal(btn){
+  stopCurrent();btn.className='btn';
+  const orig=btn.textContent;
+  L('=== 테스트1: 로컬 연속 재생 ===');
+  const files=['./audio/s_know.mp3','./audio/s_go.mp3','./audio/s_tired.mp3'];
+  let i=0;
+  function next(){
+    if(i>=files.length){btn.className='btn ok';btn.textContent='✅ '+orig;L('완료!');return;}
+    const f=files[i++];
+    L('재생: '+f);
+    playAudio(f,()=>{L('실패, 다음');setTimeout(next,0);},()=>{L('성공, 다음');setTimeout(next,0);},5000);
+  }
+  next();
+}
+
+// 테스트2: speak 함수 시뮬레이션
+function testSpeak(btn){
+  stopCurrent();btn.className='btn';
+  const orig=btn.textContent;
+  L('=== 테스트2: speak 시뮬레이션 ===');
+  
+  const text="I know your name.";
+  const currentWord="know";
+  
+  const onDone=()=>{btn.className='btn ok';btn.textContent='✅ '+orig;L('speak 완료');};
+  
+  const localUrl='./audio/s_'+currentWord+'.mp3';
+  L('로컬URL: '+localUrl);
+  
+  function wordByWord(){
+    L('--- wordByWord 폴백 ---');
+    const clean=text.replace(/[.?!,;:]+/g,'').trim();
+    const words=clean.split(/\s+/).filter(Boolean);
+    let i=0;
+    function playNext(){
+      if(i>=words.length){onDone();return;}
+      const w=words[i++];
+      L('단어: '+w);
+      const url='https://dict.youdao.com/dictvoice?audio='+encodeURIComponent(w)+'&type=2';
+      playAudio(url,()=>setTimeout(playNext,0),()=>setTimeout(playNext,0),4000);
+    }
+    playNext();
+  }
+  
+  playAudio(localUrl, wordByWord, onDone, 5000);
+}
+
+window.onload=()=>L('도메인: '+location.hostname);
+</script>
+</body>
+</html>
