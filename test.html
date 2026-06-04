@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>音频测试</title>
+<style>
+  body{font-family:sans-serif;padding:16px;background:#f5f5f5;}
+  .btn{display:block;width:100%;padding:14px;margin-bottom:10px;border:none;border-radius:12px;background:#1a1a2e;color:#fff;font-size:14px;text-align:left;cursor:pointer;}
+  .btn.ok{background:#16a34a;} .btn.fail{background:#dc2626;}
+  .log{background:#111;color:#0f0;font-size:11px;font-family:monospace;padding:12px;border-radius:10px;min-height:100px;white-space:pre-wrap;max-height:300px;overflow-y:auto;}
+</style>
+</head>
+<body>
+<h2>音频文件测试</h2>
+
+<button class="btn" onclick="test(this,'./audio/s_know.mp3')">① 本地音频 s_know.mp3</button>
+<button class="btn" onclick="test(this,'./audio/s_go.mp3')">② 本地音频 s_go.mp3</button>
+<button class="btn" onclick="test(this,'./audio/s_tired.mp3')">③ 本地音频 s_tired.mp3</button>
+<button class="btn" onclick="testSpeak(this)">④ 直接播放（模拟主应用）</button>
+
+<div class="log" id="log">等待...</div>
+
+<script>
+const log=document.getElementById('log');
+function L(m){log.textContent+=new Date().toLocaleTimeString()+' '+m+'\n';log.scrollTop=9999;}
+
+function test(btn,url){
+  const orig=btn.textContent;
+  btn.className='btn';
+  L('加载: '+url);
+  const a=new Audio();
+  let done=false;
+  const fin=(ok)=>{
+    if(done)return;done=true;
+    btn.className='btn '+(ok?'ok':'fail');
+    btn.textContent=(ok?'✅ ':'❌ ')+orig;
+    L(ok?'✅ 成功':'❌ 失败');
+  };
+  a.oncanplay=()=>L('  canplay ✓');
+  a.onplaying=()=>{btn.textContent='🔊 '+orig;L('  playing ✓');};
+  a.onended=()=>fin(true);
+  a.onerror=()=>fin(false,'error='+(a.error?a.error.code:'?'));
+  setTimeout(()=>fin(false,'超时'),6000);
+  a.src=url;
+  a.play().catch(e=>fin(false,e.message));
+}
+
+function testSpeak(btn){
+  const orig=btn.textContent;
+  btn.className='btn';
+  L('模拟speak函数: know句子');
+  const currentWord='know';
+  const localUrl='./audio/s_'+currentWord+'.mp3';
+  L('路径: '+localUrl);
+  test(btn, localUrl);
+}
+
+window.onload=()=>L('页面加载完成，域名: '+location.hostname);
+</script>
+</body>
+</html>
